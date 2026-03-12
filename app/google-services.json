@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "381635611300",
+    "project_id": "recipehub-535f1",
+    "storage_bucket": "recipehub-535f1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381635611300:android:78587d5b42e2ab21273431",
+        "android_client_info": {
+          "package_name": "com.example.mealsappkotlin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIJq59O9UUP6K4pMJe89VKqgslw5Yq-YM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
