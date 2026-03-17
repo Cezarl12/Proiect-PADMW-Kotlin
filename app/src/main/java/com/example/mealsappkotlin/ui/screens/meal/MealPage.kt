@@ -40,7 +40,7 @@ fun MealPage(navController: NavController, mealId: String) {
     val favouriteIds by favViewModel.favouriteIds.collectAsState()
 
     LaunchedEffect(mealId) {
-        mealViewModel.loadMealById(mealId)
+        mealViewModel.loadMealById(mealId, context)
         favViewModel.loadFavourites()
     }
 
@@ -135,7 +135,6 @@ fun MealPage(navController: NavController, mealId: String) {
 
                 Column(modifier = Modifier.padding(16.dp)) {
 
-                    // YouTube button
                     if (!m.strYoutube.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Card(

@@ -1,10 +1,12 @@
 package com.example.mealsappkotlin.ui
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mealsappkotlin.model.Category
 import com.example.mealsappkotlin.model.Meal
 import com.example.mealsappkotlin.network.RetrofitInstance
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -25,6 +27,8 @@ class MealViewModel : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val gson = Gson()
 
     fun loadRandomMeal() {
         viewModelScope.launch {
@@ -79,14 +83,23 @@ class MealViewModel : ViewModel() {
         }
     }
 
-    fun loadMealById(id: String) {
+    fun loadMealById(id: String, context: Context) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
                 val result = RetrofitInstance.api.getMealById(id)
-                _selectedMeal.value = result.meals?.firstOrNull()
+                val meal = result.meals?.firstOrNull()
+                if (meal != null) {
+                    _selectedMeal.value = meal
+                    val prefs = context.getSharedPreferences("meal_cache", Context.MODE_PRIVATE)
+                    prefs.edit().putString("meal_$id", gson.toJson(meal)).apply()
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
+                val prefs = context.getSharedPreferences("meal_cache", Context.MODE_PRIVATE)
+                val json = prefs.getString("meal_$id", null)
+                if (json != null) {
+                    _selectedMeal.value = gson.fromJson(json, Meal::class.java)
+                }
             } finally {
                 _isLoading.value = false
             }
