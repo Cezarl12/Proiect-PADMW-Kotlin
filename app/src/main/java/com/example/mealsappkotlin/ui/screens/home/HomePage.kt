@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.mealsappkotlin.ui.AuthViewModel
-import com.example.mealsappkotlin.ui.MealViewModel
 import com.example.mealsappkotlin.ui.navigation.Screen
+import com.example.mealsappkotlin.viewmodel.AuthViewModel
+import com.example.mealsappkotlin.viewmodel.MealViewModel
 
 @Composable
 fun HomePage(navController: NavController) {
@@ -34,7 +34,6 @@ fun HomePage(navController: NavController) {
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
 
-        // Header
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -46,10 +45,12 @@ fun HomePage(navController: NavController) {
                 Text("RecipeHub", fontSize = 22.sp, fontWeight = FontWeight.Bold)
             }
             Surface(
-                modifier = Modifier.size(40.dp).clickable {
-                    if (isLoggedIn) navController.navigate(Screen.Profile.route)
-                    else navController.navigate(Screen.Login.route)
-                },
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable {
+                        if (isLoggedIn) navController.navigate(Screen.Profile.route)
+                        else navController.navigate(Screen.Login.route)
+                    },
                 shape = RoundedCornerShape(50),
                 color = Color(0xFF1A1A2E)
             ) {
@@ -60,10 +61,8 @@ fun HomePage(navController: NavController) {
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
         Text("Descoperă", fontSize = 28.sp, fontWeight = FontWeight.Normal)
         Text("noi rețete", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -75,7 +74,10 @@ fun HomePage(navController: NavController) {
         Spacer(modifier = Modifier.height(12.dp))
 
         if (isLoading) {
-            Box(modifier = Modifier.fillMaxWidth().height(250.dp), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier.fillMaxWidth().height(250.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
         } else {
@@ -94,7 +96,6 @@ fun HomePage(navController: NavController) {
                         contentScale = ContentScale.Crop
                     )
 
-                    // Category chip
                     Surface(
                         modifier = Modifier.padding(12.dp),
                         shape = RoundedCornerShape(20.dp),
@@ -108,9 +109,11 @@ fun HomePage(navController: NavController) {
                         )
                     }
 
-                    // Arrow button
                     Surface(
-                        modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).size(36.dp),
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(12.dp)
+                            .size(36.dp),
                         shape = RoundedCornerShape(50),
                         color = Color.White.copy(alpha = 0.9f)
                     ) {
@@ -119,10 +122,7 @@ fun HomePage(navController: NavController) {
                         }
                     }
 
-                    // Bottom info
-                    Column(
-                        modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)
-                    ) {
+                    Column(modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)) {
                         Text(
                             "${meal.strArea.uppercase()} · RETETA ZILEI",
                             fontSize = 11.sp,
@@ -142,7 +142,6 @@ fun HomePage(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Explore button
         Button(
             onClick = { navController.navigate(Screen.Explore.route) },
             modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -160,7 +159,12 @@ fun HomePage(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            Text("INSPIRAT DE PASIUNE CULINARĂ", fontSize = 11.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
+            Text(
+                "INSPIRAT DE PASIUNE CULINARĂ",
+                fontSize = 11.sp,
+                color = Color.Gray,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }

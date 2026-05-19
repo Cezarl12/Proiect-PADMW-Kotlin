@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.mealsappkotlin.ui.MealViewModel
 import com.example.mealsappkotlin.ui.components.AppHeader
 import com.example.mealsappkotlin.ui.navigation.Screen
+import com.example.mealsappkotlin.viewmodel.MealViewModel
 
 @Composable
 fun ExplorePage(navController: NavController) {
@@ -46,12 +46,20 @@ fun ExplorePage(navController: NavController) {
     Column(modifier = Modifier.fillMaxSize()) {
         AppHeader(title = "Explorează", navController = navController)
 
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
             Text("Găsește rețeta", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            Text("perfectă", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text(
+                "perfectă",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Text("Caută după nume sau alege o categorie", fontSize = 14.sp, color = Color.Gray)
-
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
@@ -84,7 +92,9 @@ fun ExplorePage(navController: NavController) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.clickable {
-                            navController.navigate(Screen.ResultsByCategory.createRoute(category.strCategory))
+                            navController.navigate(
+                                Screen.ResultsByCategory.createRoute(category.strCategory)
+                            )
                         }
                     ) {
                         Card(
@@ -95,7 +105,10 @@ fun ExplorePage(navController: NavController) {
                             AsyncImage(
                                 model = category.strCategoryThumb,
                                 contentDescription = category.strCategory,
-                                modifier = Modifier.fillMaxWidth().height(80.dp).clip(RoundedCornerShape(12.dp)),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(80.dp)
+                                    .clip(RoundedCornerShape(12.dp)),
                                 contentScale = ContentScale.Crop
                             )
                         }

@@ -18,32 +18,32 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.mealsappkotlin.model.Meal
-import com.example.mealsappkotlin.network.RetrofitInstance
-import com.example.mealsappkotlin.ui.FavouriteViewModel
-import com.example.mealsappkotlin.ui.FavouriteViewModelFactory
-import com.example.mealsappkotlin.ui.MealViewModel
 import com.example.mealsappkotlin.ui.components.AppHeader
 import com.example.mealsappkotlin.ui.navigation.Screen
-import kotlinx.coroutines.launch
+import com.example.mealsappkotlin.viewmodel.FavouriteViewModel
+import com.example.mealsappkotlin.viewmodel.MealViewModel
 
+/**
+ * ResultsPage respectă UDF:
+ * - UI trimite evenimente (loadMealsByCategory / searchMeals / loadMealDetailsForResults) → ViewModel
+ * - ViewModel expune starea prin StateFlow → UI observă și se redesenează
+ * - NICIUN apel direct la Retrofit sau RetrofitInstance din Composable (anti-pattern eliminat)
+ */
 @Composable
 fun ResultsPage(navController: NavController, category: String?, query: String?) {
     val mealViewModel: MealViewModel = viewModel()
-    val context = LocalContext.current
-    val favViewModel: FavouriteViewModel = viewModel(factory = FavouriteViewModelFactory(context))
+    val favViewModel: FavouriteViewModel = viewModel()
+
     val meals by mealViewModel.meals.collectAsState()
     val isLoading by mealViewModel.isLoading.collectAsState()
     val favouriteIds by favViewModel.favouriteIds.collectAsState()
-    val scope = rememberCoroutineScope()
-    var mealDetails by remember { mutableStateOf<Map<String, Meal>>(emptyMap()) }
+    val mealDetails by mealViewModel.mealDetails.collectAsState()
 
     LaunchedEffect(category, query) {
         favViewModel.loadFavourites()
@@ -53,18 +53,10 @@ fun ResultsPage(navController: NavController, category: String?, query: String?)
         }
     }
 
+    // Când filtrul e by category, API-ul returnează date parțiale → cerem detalii prin ViewModel
     LaunchedEffect(meals) {
-        if (meals.isNotEmpty() && query != null) {
-            scope.launch {
-                val details = mutableMapOf<String, Meal>()
-                meals.forEach { meal ->
-                    try {
-                        val result = RetrofitInstance.api.getMealById(meal.idMeal)
-                        result.meals?.firstOrNull()?.let { details[meal.idMeal] = it }
-                    } catch (e: Exception) { }
-                }
-                mealDetails = details
-            }
+        if (meals.isNotEmpty() && category != null) {
+            mealViewModel.loadMealDetailsForResults(meals.map { it.idMeal })
         }
     }
 
@@ -101,7 +93,9 @@ fun ResultsPage(navController: NavController, category: String?, query: String?)
                             .fillMaxWidth()
                             .height(150.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .clickable { navController.navigate(Screen.Meal.createRoute(meal.idMeal)) }
+                            .clickable {
+                                navController.navigate(Screen.Meal.createRoute(meal.idMeal))
+                            }
                     ) {
                         AsyncImage(
                             model = meal.strMealThumb,
@@ -110,7 +104,6 @@ fun ResultsPage(navController: NavController, category: String?, query: String?)
                             contentScale = ContentScale.Crop
                         )
 
-                        // Gradient
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -130,7 +123,8 @@ fun ResultsPage(navController: NavController, category: String?, query: String?)
                             modifier = Modifier.align(Alignment.TopEnd)
                         ) {
                             Icon(
-                                if (favouriteIds.contains(meal.idMeal)) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                if (favouriteIds.contains(meal.idMeal)) Icons.Filled.Favorite
+                                else Icons.Filled.FavoriteBorder,
                                 contentDescription = null,
                                 tint = if (favouriteIds.contains(meal.idMeal)) Color.Red else Color.White
                             )

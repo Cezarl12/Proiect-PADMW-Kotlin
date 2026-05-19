@@ -25,22 +25,23 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.mealsappkotlin.ui.FavouriteViewModel
-import com.example.mealsappkotlin.ui.FavouriteViewModelFactory
-import com.example.mealsappkotlin.ui.MealViewModel
 import com.example.mealsappkotlin.ui.components.AppHeader
+import com.example.mealsappkotlin.viewmodel.FavouriteViewModel
+import com.example.mealsappkotlin.viewmodel.MealViewModel
 
 @Composable
 fun MealPage(navController: NavController, mealId: String) {
+    // Fără Context în ViewModel — AndroidViewModel gestionează intern cache-ul
     val mealViewModel: MealViewModel = viewModel()
+    val favViewModel: FavouriteViewModel = viewModel()
     val context = LocalContext.current
-    val favViewModel: FavouriteViewModel = viewModel(factory = FavouriteViewModelFactory(context))
+
     val meal by mealViewModel.selectedMeal.collectAsState()
     val isLoading by mealViewModel.isLoading.collectAsState()
     val favouriteIds by favViewModel.favouriteIds.collectAsState()
 
     LaunchedEffect(mealId) {
-        mealViewModel.loadMealById(mealId, context)
+        mealViewModel.loadMealById(mealId)   // fără context — repository-ul îl are intern
         favViewModel.loadFavourites()
     }
 
@@ -52,14 +53,14 @@ fun MealPage(navController: NavController, mealId: String) {
     }
 
     meal?.let { m ->
-        val ingredients = (1..20).mapNotNull { i ->
-            val ingredient = when(i) {
+        val ingredients = (1..10).mapNotNull { i ->
+            val ingredient = when (i) {
                 1 -> m.strIngredient1; 2 -> m.strIngredient2; 3 -> m.strIngredient3
                 4 -> m.strIngredient4; 5 -> m.strIngredient5; 6 -> m.strIngredient6
                 7 -> m.strIngredient7; 8 -> m.strIngredient8; 9 -> m.strIngredient9
                 10 -> m.strIngredient10; else -> null
             }
-            val measure = when(i) {
+            val measure = when (i) {
                 1 -> m.strMeasure1; 2 -> m.strMeasure2; 3 -> m.strMeasure3
                 4 -> m.strMeasure4; 5 -> m.strMeasure5; 6 -> m.strMeasure6
                 7 -> m.strMeasure7; 8 -> m.strMeasure8; 9 -> m.strMeasure9
@@ -107,18 +108,19 @@ fun MealPage(navController: NavController, mealId: String) {
 
                     IconButton(
                         onClick = { favViewModel.toggle(m) },
-                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
                     ) {
                         Icon(
-                            if (favouriteIds.contains(m.idMeal)) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            if (favouriteIds.contains(m.idMeal)) Icons.Filled.Favorite
+                            else Icons.Filled.FavoriteBorder,
                             contentDescription = null,
                             tint = if (favouriteIds.contains(m.idMeal)) Color.Red else Color.White
                         )
                     }
 
-                    Column(
-                        modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)
-                    ) {
+                    Column(modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)) {
                         Text(
                             "${m.strArea.uppercase()} • ${m.strCategory.uppercase()}",
                             fontSize = 12.sp,
@@ -202,7 +204,9 @@ fun MealPage(navController: NavController, mealId: String) {
 
                     steps.forEachIndexed { index, step ->
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp),
                             verticalAlignment = Alignment.Top
                         ) {
                             Surface(

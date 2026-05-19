@@ -17,22 +17,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.mealsappkotlin.ui.FavouriteViewModel
-import com.example.mealsappkotlin.ui.FavouriteViewModelFactory
 import com.example.mealsappkotlin.ui.components.AppHeader
 import com.example.mealsappkotlin.ui.navigation.Screen
+import com.example.mealsappkotlin.viewmodel.FavouriteViewModel
 
 @Composable
 fun FavouritePage(navController: NavController) {
-    val context = LocalContext.current
-    val favViewModel: FavouriteViewModel = viewModel(factory = FavouriteViewModelFactory(context))
+    // FavouriteViewModel extinde AndroidViewModel → nu mai e nevoie de Factory custom
+    val favViewModel: FavouriteViewModel = viewModel()
     val favourites by favViewModel.favourites.collectAsState()
 
     LaunchedEffect(Unit) { favViewModel.loadFavourites() }
@@ -40,11 +38,14 @@ fun FavouritePage(navController: NavController) {
     Column(modifier = Modifier.fillMaxSize()) {
         AppHeader(title = "Favorite", navController = navController)
 
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
             Text("Rețetele tale", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
             Text("${favourites.size} rețete salvate", fontSize = 14.sp, color = Color.Gray)
-
             Spacer(modifier = Modifier.height(16.dp))
 
             if (favourites.isEmpty()) {
@@ -63,7 +64,9 @@ fun FavouritePage(navController: NavController) {
                                 .fillMaxWidth()
                                 .height(180.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .clickable { navController.navigate(Screen.Meal.createRoute(meal.idMeal)) }
+                                .clickable {
+                                    navController.navigate(Screen.Meal.createRoute(meal.idMeal))
+                                }
                         ) {
                             AsyncImage(
                                 model = meal.strMealThumb,
@@ -72,7 +75,6 @@ fun FavouritePage(navController: NavController) {
                                 contentScale = ContentScale.Crop
                             )
 
-                            // Gradient
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
