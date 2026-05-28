@@ -28,9 +28,14 @@ import coil.compose.AsyncImage
 import com.example.mealsappkotlin.ui.components.AppHeader
 import com.example.mealsappkotlin.viewmodel.FavouriteViewModel
 import com.example.mealsappkotlin.viewmodel.MealViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun MealPage(navController: NavController, mealId: String) {
+fun MealPage(
+    navController: NavController,
+    mealId: String,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+) {
     // Fără Context în ViewModel — AndroidViewModel gestionează intern cache-ul
     val mealViewModel: MealViewModel = viewModel()
     val favViewModel: FavouriteViewModel = viewModel()
@@ -39,9 +44,10 @@ fun MealPage(navController: NavController, mealId: String) {
     val meal by mealViewModel.selectedMeal.collectAsState()
     val isLoading by mealViewModel.isLoading.collectAsState()
     val favouriteIds by favViewModel.favouriteIds.collectAsState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(mealId) {
-        mealViewModel.loadMealById(mealId)   // fără context — repository-ul îl are intern
+        mealViewModel.loadMealById(mealId)
         favViewModel.loadFavourites()
     }
 
@@ -107,7 +113,15 @@ fun MealPage(navController: NavController, mealId: String) {
                     )
 
                     IconButton(
-                        onClick = { favViewModel.toggle(m) },
+                        onClick = {
+                            val wasAdded = !favouriteIds.contains(m.idMeal)
+                            favViewModel.toggle(m)
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    if (wasAdded) "Adăugat la favorite ❤️" else "Eliminat din favorite"
+                                )
+                            }
+                        },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(8.dp)

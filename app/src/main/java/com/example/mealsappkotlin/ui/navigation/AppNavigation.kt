@@ -1,5 +1,6 @@
 package com.example.mealsappkotlin.ui.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,9 +18,7 @@ import com.example.mealsappkotlin.ui.screens.register.RegisterPage
 import com.example.mealsappkotlin.ui.screens.results.ResultsPage
 import com.example.mealsappkotlin.viewmodel.AuthViewModel
 
-/**
- * Rutele aplicației definite ca sealed class — un singur loc de adevăr pentru navigație.
- */
+
 sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Explore : Screen("explore")
@@ -41,7 +40,9 @@ sealed class Screen(val route: String) {
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    showSnackbar: (String) -> Unit = {}
 ) {
     // AuthViewModel în loc de AuthService — respectă arhitectura MVVM.
     // ViewModel-ul e creat o singură dată și supraviețuiește recompunărilor.
@@ -55,13 +56,14 @@ fun AppNavigation(
     ) {
         composable(Screen.Home.route) { HomePage(navController) }
         composable(Screen.Explore.route) { ExplorePage(navController) }
-        composable(Screen.Login.route) { LoginPage(navController) }
-        composable(Screen.Register.route) { RegisterPage(navController) }
+        composable(Screen.Login.route) { LoginPage(navController, showSnackbar) }
+        composable(Screen.Register.route) { RegisterPage(navController, showSnackbar) }
 
         composable(Screen.Meal.route) { backStackEntry ->
             MealPage(
                 navController = navController,
-                mealId = backStackEntry.arguments?.getString("mealId") ?: ""
+                mealId = backStackEntry.arguments?.getString("mealId") ?: "",
+                snackbarHostState = snackbarHostState
             )
         }
         composable(Screen.ResultsByCategory.route) { backStackEntry ->
@@ -82,7 +84,7 @@ fun AppNavigation(
         // Rute protejate — verificarea autentificării vine din StateFlow, nu din apel direct la Firebase
         composable(Screen.Favourite.route) {
             if (isLoggedIn) {
-                FavouritePage(navController)
+                FavouritePage(navController, snackbarHostState)
             } else {
                 LaunchedEffect(Unit) {
                     navController.navigate(Screen.Login.route) {
@@ -93,7 +95,7 @@ fun AppNavigation(
         }
         composable(Screen.Profile.route) {
             if (isLoggedIn) {
-                ProfilePage(navController)
+                ProfilePage(navController, showSnackbar)
             } else {
                 LaunchedEffect(Unit) {
                     navController.navigate(Screen.Login.route) {

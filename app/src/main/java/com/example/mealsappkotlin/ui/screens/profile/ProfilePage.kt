@@ -23,7 +23,10 @@ import com.example.mealsappkotlin.viewmodel.FavouriteViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ProfilePage(navController: NavController) {
+fun ProfilePage(
+    navController: NavController,
+    showSnackbar: (String) -> Unit = {}
+) {
     val authViewModel: AuthViewModel = viewModel()
     val favViewModel: FavouriteViewModel = viewModel()
     val favourites by favViewModel.favourites.collectAsState()
@@ -88,6 +91,7 @@ fun ProfilePage(navController: NavController) {
             Button(
                 onClick = {
                     authViewModel.logout {
+                        showSnackbar("Te-ai deconectat cu succes")
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }

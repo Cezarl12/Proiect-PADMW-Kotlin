@@ -22,7 +22,10 @@ import com.example.mealsappkotlin.ui.navigation.Screen
 import com.example.mealsappkotlin.viewmodel.AuthViewModel
 
 @Composable
-fun RegisterPage(navController: NavController) {
+fun RegisterPage(
+    navController: NavController,
+    showSnackbar: (String) -> Unit = {}
+) {
     val authViewModel: AuthViewModel = viewModel()
     val isLoading by authViewModel.isLoading.collectAsState()
     val error by authViewModel.error.collectAsState()
@@ -31,6 +34,10 @@ fun RegisterPage(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(error) {
+        error?.let { showSnackbar(it) }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         AppHeader(title = "Register", navController = navController, showBack = true)
@@ -112,7 +119,12 @@ fun RegisterPage(navController: NavController) {
 
             Button(
                 onClick = {
+                    if (name.isBlank() || email.isBlank() || password.isBlank()) {
+                        showSnackbar("Completează toate câmpurile")
+                        return@Button
+                    }
                     authViewModel.register(name, email, password) {
+                        showSnackbar("Cont creat cu succes! 🎉")
                         navController.navigate(Screen.Home.route) {
                             popUpTo(0) { inclusive = true }
                         }
@@ -143,7 +155,7 @@ fun RegisterPage(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedButton(
-                onClick = { navController.navigate(Screen.Login.route) },
+                onClick = { navController.popBackStack() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

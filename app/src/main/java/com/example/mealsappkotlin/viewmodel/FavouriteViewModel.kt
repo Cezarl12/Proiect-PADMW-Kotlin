@@ -10,12 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel pentru gestionarea rețetelor favorite.
- *
- * Folosește AndroidViewModel → nu mai e nevoie de FavouriteViewModelFactory custom.
- * viewModel<FavouriteViewModel>() funcționează direct în orice Composable.
- */
+
 class FavouriteViewModel(application: Application) : AndroidViewModel(application) {
 
     private val authService = AuthService()

@@ -26,12 +26,16 @@ import coil.compose.AsyncImage
 import com.example.mealsappkotlin.ui.components.AppHeader
 import com.example.mealsappkotlin.ui.navigation.Screen
 import com.example.mealsappkotlin.viewmodel.FavouriteViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun FavouritePage(navController: NavController) {
-    // FavouriteViewModel extinde AndroidViewModel → nu mai e nevoie de Factory custom
+fun FavouritePage(
+    navController: NavController,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+) {
     val favViewModel: FavouriteViewModel = viewModel()
     val favourites by favViewModel.favourites.collectAsState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) { favViewModel.loadFavourites() }
 
@@ -87,7 +91,12 @@ fun FavouritePage(navController: NavController) {
                             )
 
                             IconButton(
-                                onClick = { favViewModel.toggle(meal) },
+                                onClick = {
+                                    favViewModel.toggle(meal)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Eliminat din favorite")
+                                    }
+                                },
                                 modifier = Modifier.align(Alignment.TopStart)
                             ) {
                                 Icon(

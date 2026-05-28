@@ -22,7 +22,10 @@ import com.example.mealsappkotlin.ui.navigation.Screen
 import com.example.mealsappkotlin.viewmodel.AuthViewModel
 
 @Composable
-fun LoginPage(navController: NavController) {
+fun LoginPage(
+    navController: NavController,
+    showSnackbar: (String) -> Unit = {}
+) {
     val authViewModel: AuthViewModel = viewModel()
     val isLoading by authViewModel.isLoading.collectAsState()
     val error by authViewModel.error.collectAsState()
@@ -30,6 +33,10 @@ fun LoginPage(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(error) {
+        error?.let { showSnackbar(it) }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         AppHeader(title = "Login", navController = navController, showBack = true)
@@ -99,7 +106,12 @@ fun LoginPage(navController: NavController) {
 
             Button(
                 onClick = {
+                    if (email.isBlank() || password.isBlank()) {
+                        showSnackbar("Completează toate câmpurile")
+                        return@Button
+                    }
                     authViewModel.login(email, password) {
+                        showSnackbar("Bun venit înapoi! 🍽️")
                         navController.navigate(Screen.Home.route) {
                             popUpTo(0) { inclusive = true }
                         }

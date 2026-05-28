@@ -1,0 +1,53 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Chef hat — toca de bucătar -->
+    <!-- Partea pufoasă din vârf -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,30
+                          C46,30 39,34 35.5,41
+                          C28,41 22,47 22,54.5
+                          C22,60.5 26,65.5 31.5,67
+                          L31.5,74
+                          L76.5,74
+                          L76.5,67
+                          C82,65.5 86,60.5 86,54.5
+                          C86,47 80,41 72.5,41
+                          C69,34 62,30 54,30 Z" />
+
+    <!-- Banda de la baza tocii -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M30,74
+                          L30,84
+                          C30,86.2 31.8,88 34,88
+                          L74,88
+                          C76.2,88 78,86.2 78,84
+                          L78,74 Z" />
+
+    <!-- Dunga decorativă de pe bandă -->
+    <path
+        android:fillColor="#FFF4A261"
+        android:pathData="M32,77 L76,77 L76,80.5 L32,80.5 Z" />
+
+    <!-- Lingură + furculiță încrucișate sub bandă, pentru claritate "bucătărie" -->
+    <!-- Linguriță stilizată în stânga -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M40,92
+                          C40,90 41.5,88.5 43.5,88.5
+                          C45.5,88.5 47,90 47,92
+                          L47,94
+                          C47,95.2 46,96.2 44.8,96.2
+                          L42.2,96.2
+                          C41,96.2 40,95.2 40,94 Z" />
+
+    <!-- Furculiță stilizată în dreapta -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M62,89 L63.5,89 L63.5,92.5 L65,92.5 L65,89 L66.5,89 L66.5,92.5 L68,92.5 L68,89 L69.5,89 L69.5,94 L66.5,95 L66.5,97 L63,97 L63,95 L62,94 Z" />
+</vector>

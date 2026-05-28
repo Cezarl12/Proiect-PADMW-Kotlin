@@ -10,15 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel pentru rețete și categorii.
- *
- * Folosește AndroidViewModel pentru a accesa Application context în siguranță —
- * fără a stoca referințe la Activity/Fragment (anti-pattern ce cauzează memory leaks).
- *
- * Datele vin prin MealRepository (Repository Pattern), NU prin apeluri directe la Retrofit.
- * Starea e expusă prin StateFlow → UI observă și se redesenează automat (UDF).
- */
+
 class MealViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = MealRepository(application)
@@ -38,14 +30,13 @@ class MealViewModel(application: Application) : AndroidViewModel(application) {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    /** Detalii complete pentru rețetele din lista de rezultate (ex: categorie din filtru by category). */
+
     private val _mealDetails = MutableStateFlow<Map<String, Meal>>(emptyMap())
     val mealDetails: StateFlow<Map<String, Meal>> = _mealDetails
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    // ─── Acțiuni ────────────────────────────────────────────────────────────────
 
     fun loadRandomMeal() {
         viewModelScope.launch {
@@ -104,7 +95,6 @@ class MealViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /** Fără Context — repository-ul gestionează cache-ul intern. */
     fun loadMealById(id: String) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -119,10 +109,7 @@ class MealViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /**
-     * Încarcă detalii complete pentru o listă de ID-uri.
-     * Folosit în ResultsPage când API-ul returnează date parțiale (filtru by category).
-     */
+
     fun loadMealDetailsForResults(mealIds: List<String>) {
         viewModelScope.launch {
             val details = mutableMapOf<String, Meal>()
